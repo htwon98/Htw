@@ -1,0 +1,41 @@
+---
+- hosts: localhost
+  vars_files: ./vars2.yaml
+
+  tasks: 
+    - name: Create guest VMs
+      community.vmware.vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: 'false'
+        datacenter: '{{datacenter_name}}'
+        folder: '{{ folder_prefix }}'
+        name: '{{ item.vmname }}'
+        state: poweredon
+        guest_id: vmkernel7Guest
+        esxi_hostname: "{{ esxi_hostname }}"
+        hardware:
+          num_cpus: 2
+          nested_virt: yes
+          memory_mb: 4096
+        disk:
+        - size_gb: 100
+          controller_type: 'paravirtual'
+          controller_number: 0
+          unit_number: 0
+          type: thin
+          datastore: '{{ guest_datastore }}'
+        networks:
+        - name: "{{ 'DPG-Prod' }}"
+          device_type: vmxnet3
+        cdrom:
+        - controller_number: 0
+          unit_number: 0
+          state: present
+          type: iso
+          iso_path: '{{ "[" + datastore_name + "]\ko-kr_windows_server_2022_updated_april_2023_x64_dvd_54c81ef3.iso" }}'          
+      with_items:
+      - {vmname: "{{ 'JMT-guest-01' }}" }
+      delegate_to: localhost
+      register: deploy_vm
