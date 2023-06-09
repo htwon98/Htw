@@ -20,7 +20,7 @@
           nested_virt: yes
           memory_mb: 4096
         disk:
-        - size_gb: 100
+        - size_gb: 60
           controller_type: 'paravirtual'
           controller_number: 0
           unit_number: 0
@@ -34,6 +34,7 @@
           unit_number: 0
           state: present
           type: iso
+          #iso파일은 알아서 변경
           iso_path: '{{ "[" + datastore_name + "]\ko-kr_windows_server_2022_updated_april_2023_x64_dvd_54c81ef3.iso" }}'          
       with_items:
       - {vmname: "{{ 'JMT-guest-01' }}" }

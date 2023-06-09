@@ -1,6 +1,6 @@
 ansible_python_interpreter: /bin/python3
 
-student_ID: "S20"
+student_ID: "JMT05"
 
 vcenter_hostname: "10.10.10.10"
 vcenter_username: "administrator@vsphere.local"
@@ -9,23 +9,13 @@ vcenter_password: "VMware1!"
 datacenter_name: "KH"
 
 folder_prefix: "KH/vm/guest"
-
+#esxi_hostname은 자신의 esxi의 FQDN중 하나로 설정
 esxi_hostname: "sa-esxi-01.vclass.local"
 esxi_password: "VMware1!"
 esxi_username: "root"
 
 public_net: "VM-200.200.200.x"
 private_net: "{{ student_ID + '-Trunk' }}"
-
+#datastore는 유동적으로 변경
 datastore_name: "iSCSI-1"
 guest_datastore: "vsanDatastore"
-
-dc_template_name: "Temp-WinSvr2022-ESXi-05"
-dc_snapshot_src_name: "KH4"
-
-esxi_template_name: "Temp-ESXi-05"
-
-sa_esxi_template_name: "Temp-SA-ESXi-05"
-
-vcsa_template_name: "Temp-VCSA-ESXi-05"
-vcsa_snapshot_src_name: "Installed"
