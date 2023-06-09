@@ -1,0 +1,24 @@
+ansible_python_interpreter: /bin/python3
+
+student_ID: "JMT05"
+#ID미리미리 본인걸로 바꿔두기
+vcenter_hostname: "200.200.200.251"
+vcenter_username: "S20@vclass.kh"
+vcenter_password: "VMware1!"
+
+datacenter_name: "Datacenter"
+
+folder_prefix: "Datacenter/vm/JMT/"
+
+# JMT 247번 사용
+
+esxi_hostname: "200.200.200.247"
+esxi_password: "VMware1!"
+esxi_username: "root"
+
+public_net: "VM-200.200.200.x"
+private_net: "{{ student_ID + '-Trunk' }}"
+
+datastore_name: "Local-02"
+
+
