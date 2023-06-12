@@ -1,0 +1,68 @@
+---
+- hosts: localhost
+
+  vars_files: ./vars.yaml
+
+  tasks: 
+    - name: VyOS Router Configuration
+      community.vmware.vmware_vm_shell:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        validate_certs: 'false'
+        datacenter: '{{ datacenter_name }}'
+        folder: '{{ folder_prefix + student_ID }}'
+        vm_id: "{{ student_ID + '-Router' }}"
+        vm_id_type: vm_name
+        vm_username: 'vyos'
+        vm_password: 'vyos'
+        vm_shell: /bin/vbash
+        vm_shell_cwd: "/tmp"
+        vm_shell_args: |-
+          -c "source /opt/vyatta/etc/functions/script-template
+          configure
+          set firewall name OUTSIDE-LOCAL rule 40 action 'accept'
+          set firewall name OUTSIDE-LOCAL rule 40 protocol 'esp'
+          set firewall name OUTSIDE-LOCAL rule 41 action 'accept'
+          set firewall name OUTSIDE-LOCAL rule 41 destination port '500'
+          set firewall name OUTSIDE-LOCAL rule 41 protocol 'udp'
+          set firewall name OUTSIDE-LOCAL rule 42 action 'accept'
+          set firewall name OUTSIDE-LOCAL rule 42 destination port '4500'
+          set firewall name OUTSIDE-LOCAL rule 42 protocol 'udp'
+          set firewall name OUTSIDE-LOCAL rule 43 action 'accept'
+          set firewall name OUTSIDE-LOCAL rule 43 destination port '1701'
+          set firewall name OUTSIDE-LOCAL rule 43 ipsec 'match-ipsec'
+          set firewall name OUTSIDE-LOCAL rule 43 protocol 'udp'
+          set vpn ipsec esp-group eg compression 'disable'
+          set vpn ipsec esp-group eg lifetime '1800'
+          set vpn ipsec esp-group eg mode 'tunnel'
+          set vpn ipsec esp-group eg pfs 'enable'
+          set vpn ipsec esp-group eg proposal 1 encryption 'aes256'
+          set vpn ipsec esp-group eg proposal 1 hash 'sha1'
+          set vpn ipsec ike-group ig ikev2-reauth 'no'
+          set vpn ipsec ike-group ig key-exchange 'ikev1'
+          set vpn ipsec ike-group ig lifetime '3600'
+          set vpn ipsec ike-group ig proposal 1 encryption 'aes256'
+          set vpn ipsec ike-group ig proposal 1 hash 'sha1'
+          set vpn ipsec ipsec-interfaces interface 'eth0'
+          set vpn ipsec site-to-site peer 200.200.200.209 authentication mode 'pre-shared-secret'
+          set vpn ipsec site-to-site peer 200.200.200.209 authentication pre-shared-secret 'JMT'
+          set vpn ipsec site-to-site peer 200.200.200.209 ike-group 'ig'
+          set vpn ipsec site-to-site peer 200.200.200.209 default-esp-group 'eg'
+          set vpn ipsec site-to-site peer 200.200.200.209 local-address '200.200.200.210'
+          set vpn ipsec site-to-site peer 200.200.200.209 tunnel 1 allow-nat-networks 'disable'
+          set vpn ipsec site-to-site peer 200.200.200.209 tunnel 1 allow-public-networks 'disable'
+          set vpn ipsec site-to-site peer 200.200.200.209 tunnel 1 local prefix '10.10.10.0/24'
+          set vpn ipsec site-to-site peer 200.200.200.209 tunnel 1 remote prefix '10.10.20.0/24'
+          set nat source rule 10 destination address '10.10.20.0/24'
+          set nat source rule 10 'exclude'
+          set nat source rule 10 outbound-interface 'eth0'
+          set nat source rule 10 source address '10.10.10.0/24'
+          set firewall name OUTSIDE-LOCAL rule 32 action 'accept'
+          set firewall name OUTSIDE-LOCAL rule 32 source address '10.10.20.0/24'
+          commit
+          save"
+        wait_for_process: True
+        timeout: 180
+      delegate_to: localhost
+      register: shell_command_with_wait_timeout
